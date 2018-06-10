@@ -1,0 +1,9 @@
+{
+    "listOfResourceTypesAllowed":  {
+      "value": [
+        "Microsoft.Compute",
+        "Microsoft.Network",
+        "Microsoft.Storage"
+      ]
+    }
+}

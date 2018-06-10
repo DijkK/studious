@@ -1,0 +1,2 @@
+RGname,RGlocation,storageNamePrefix,storageSKU,VNname,AddressPrefix,SNname1,SN1AP,SNname2,SN2AP,SNname3,SN3AP
+SentiaAssesmentRG,West Europe,Sentia,Standard_LRS,SentiaAssesmentVN,172.16.0.0/12,SubnetA,172.16.0.0/14,SubnetB,172.20.0.0/14,SubnetC,172.24.0.0/14

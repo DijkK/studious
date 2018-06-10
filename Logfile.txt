@@ -1,0 +1,48 @@
+
+Thursday 7-6 16:00 - 19:00
+- read the links and setting up git and github https://github.com/DijkK/studious.git
+- read about azure and make account
+
+Friday 8-6 17:30-23:00
+-install azure powershell
+-create script and templates, see below for details.
+
+Sunday 10-6 22:30 -23:45
+-Clean up logfile and assignment.
+
+1. Create a Resource Group in West Europe and a Storage Account in the above created Resource Group, using encryption and an unique name, starting with the prefix 'sentia'
+Used the link:
+https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-create-first-template
+
+2. A Virtual Network in the above created Resource Group with three subnets, using 172.16.0.0/12 as the address prefix
+Used the link:
+https://docs.microsoft.com/en-us/azure/virtual-network/quick-create-powershell
+> Subnet can be devided equally in 2 or 4 subnets, choose to do four then a spare can always be created.
+
+3. Apply the following tags to the resource group: Environment='Test', Company='Sentia'
+Used the link:
+https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-using-tags
+> When you already have excisting tags (which was not the case now) you need another command:
+##Adding a new tag
+#$tags = (Get-AzureRmResourceGroup -Name $RGname).Tags
+#$tags.Add("Environment", "Test")
+#Set-AzureRmResourceGroup -Tag $tags -Name $RGname
+
+4. Create a policy definition using a template and parameter file, to restrict the resourcetypes to only allow: compute, network and storage resourcetypes
+Assign the policy definition to the subscription and resource group you created previously
+Used the links:
+https://docs.microsoft.com/en-us/azure/azure-policy/scripts/allowed-res-types
+https://docs.microsoft.com/en-us/powershell/module/azurerm.resources/new-azurermpolicyassignment?view=azurermps-6.2.0
+https://docs.microsoft.com/nl-nl/azure/azure-resource-manager/resource-manager-supported-services
+> i found this the hardest part, there were different ways but as the assignment asks for a parameter file i choose this way. Restricting resource types is an already excisting policy so could rever to that.
+other ways policy:
+$ResourceGroup = Get-AzureRmResourceGroup -Name "$RGname"
+$definition = New-AzureRmPolicyDefinition -Name "allowed-resourcetypes" -DisplayName "Allowed resource types" -description "This policy enables you to specify the resource types that your organization can deploy." -Policy 'https://raw.githubusercontent.com/Azure/azure-policy/master/samples/built-in-policy/allowed-resourcetypes/azurepolicy.rules.json' -Parameter 'https://raw.githubusercontent.com/Azure/azure-policy/master/samples/built-in-policy/allowed-resourcetypes/azurepolicy.parameters.json' -Mode All
+$ResourceTypes = Get-AzureRmResourceProvider -ProviderNamespace Microsoft.Compute,Microsoft.Storage,Microsoft.Network
+$AllowedTypes = @{"listOfResourceTypesAllowed"=($ResourceTypes.ProviderNamespace)}
+New-AzureRmPolicyAssignment -Name "RestrictResourcetypes" -PolicyDefinition $definition -Scope $ResourceGroup.ResourceId -PolicyParameterObject $AllowedTypes
+
+$definition = New-AzureRmPolicyDefinition -Name "allowed-resourcetypes" -DisplayName "Allowed resource types" -description "This policy enables you to specify the resource types that your organization can deploy." -Policy 'https://raw.githubusercontent.com/Azure/azure-policy/master/samples/built-in-policy/allowed-resourcetypes/azurepolicy.rules.json' -Parameter 'https://raw.githubusercontent.com/Azure/azure-policy/master/samples/built-in-policy/allowed-resourcetypes/azurepolicy.parameters.json' -Mode All
+$definition
+$assignment = New-AzureRMPolicyAssignment -Name "allowedresourcetypesSentia" -Scope $ResourceGroup.ResourceId  -listOfResourceTypesAllowed Microsoft.Compute,Microsoft.Network,Microsoft.Storage -PolicyDefinition $definition
+$assignment
